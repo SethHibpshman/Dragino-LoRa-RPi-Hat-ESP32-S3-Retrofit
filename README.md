@@ -1,4 +1,4 @@
-# dragino-lora-hat-esp32s3-retrofit
+# Dragino LoRa RPi Hat ESP32 Retrofit
 
 Custom [MeshCore](https://github.com/meshcore-dev/MeshCore) firmware and PCB carrier for running a **Dragino LoRa/GPS HAT** on an **ESP32-S3** instead of the Raspberry Pi it was designed for.
 
