@@ -4,8 +4,6 @@ Custom [MeshCore](https://github.com/meshcore-dev/MeshCore) firmware and PCB car
 
 ![Assembled node](images/assembled_project.png)
 
----
-
 ## What this actually is
 
 The Dragino LoRa GPS HAT is built for the Raspberry Pi 40-pin GPIO header. It has no business working with an ESP32-S3 dev board. There's no official pinout for it, no example firmware, and none of the pin numbers on the HAT correspond to anything on an ESP32.
@@ -13,8 +11,6 @@ The Dragino LoRa GPS HAT is built for the Raspberry Pi 40-pin GPIO header. It ha
 I designed a custom carrier PCB that reroutes the Dragino HAT's SPI, IRQ, and GPS UART lines to an ESP32-S3-DevKitC-1-N16R8, wrote a new MeshCore board target from scratch to drive that hardware, and got it running as three different mesh network node roles: a headless GPS repeater, a Bluetooth companion radio, and a USB-wired companion radio.
 
 Everything here, the PCB, the case, and the firmware, was built to get an off-the-shelf Raspberry Pi accessory running on a completely different microcontroller architecture.
-
----
 
 ## The hardware
 
@@ -35,8 +31,6 @@ The Dragino HAT header doesn't line up with anything on the ESP32-S3, so I desig
 
 Modeled a low-profile tray enclosure to hold the stacked board assembly, sized to the footprint of the carrier PCB with room for the antenna connector and button access.
 
----
-
 ## What I actually had to figure out
 
 This wasn't a drop-in board support file. Getting MeshCore to run correctly on this combination of parts meant working through a handful of problems that don't show up on boards MeshCore already supports:
@@ -53,8 +47,6 @@ This wasn't a drop-in board support file. Getting MeshCore to run correctly on t
 
 **Three node roles from one codebase, decided at compile time.** MeshCore can build as a repeater, a BLE companion radio, or (with a small addition I made to the variant's `platformio.ini`) a wired USB companion radio. The BLE-vs-USB choice comes down to whether `BLE_PIN_CODE` is defined at build time: if it is, `main.cpp` compiles in `SerialBLEInterface`; if it isn't, it falls through to plain `ArduinoSerialInterface` and the companion protocol runs over native USB serial instead. Same firmware logic, same wiring, different transport, chosen by which PlatformIO environment you flash.
 
----
-
 ## Node roles
 
 | Role | Connectivity | Use case |
@@ -65,67 +57,20 @@ This wasn't a drop-in board support file. Getting MeshCore to run correctly on t
 
 All three are built from the same variant and the same wiring; the only thing that changes is which PlatformIO environment gets flashed.
 
----
-
-## Wiring (LoRa/GPS, required for every role)
-
-| Dragino HAT Pin | Function | ESP32-S3 GPIO |
-|---|---|---|
-| 3.3V | Power | 3V3 |
-| GND | Ground | GND |
-| LoRa_NSS | SPI CS | GPIO 5 |
-| LoRa_MOSI | SPI MOSI | GPIO 11 |
-| LoRa_MISO | SPI MISO | GPIO 13 |
-| SCK | SPI Clock | GPIO 12 |
-| DIO0 | LoRa IRQ | GPIO 4 |
-| DIO1 | LoRa IRQ | GPIO 6 |
-| DIO2 | LoRa IRQ | GPIO 7 |
-| RESET | LoRa Reset | GPIO 14 |
-| GPS_TXD | GPS data out | GPIO 17 |
-| GPS_RXD | GPS data in | GPIO 18 |
-
-Companion-radio-only wiring (SSD1306, button, buzzer) is on the PCB directly; see `pcb.png` above for the full layout including I2C and GPIO assignments.
-
-> **Antenna warning:** always connect the 915MHz antenna before powering on. Transmitting without one can permanently damage the SX1276.
-
----
-
 ## Building it
 
-```powershell
-git clone https://github.com/meshcore-dev/MeshCore.git
-cd MeshCore
-# copy in this repo's variants/dragino_esp32s3/ and boards/dragino_esp32s3_n16r8.json
-
-& "$HOME\.platformio\penv\Scripts\pio.exe" run -e dragino_esp32s3_repeater --target upload
-& "$HOME\.platformio\penv\Scripts\pio.exe" run -e dragino_esp32s3_companion_radio_ble --target upload
-& "$HOME\.platformio\penv\Scripts\pio.exe" run -e dragino_esp32s3_companion_radio_usb --target upload
-```
-
-Any of the three roles can be reflashed onto the same hardware at any time, the firmware overwrites completely.
+Please see the [full guide](../../wiki/Building-It) in the wiki.
 
 ---
 
-## File structure
+## Author
 
-```
-MeshCore/
-├── boards/
-│   └── dragino_esp32s3_n16r8.json     ← custom board def, fixes PSRAM crash
-└── variants/
-    └── dragino_esp32s3/
-        ├── DraginoESP32S3Board.h      ← board IRQ class
-        ├── target.h                   ← hardware declarations
-        ├── target.cpp                 ← hardware implementation
-        └── platformio.ini             ← repeater / BLE / USB build environments
-```
+**Seth Hibpshman**  
+Student of Electrical Engineering, Eastern Washington University
 
----
+## AI Disclosure
+_AI (LLM) tools were used for quality assurance review of the firmware and in the drafting and editing of this README and wiki documentation; all code was written by hand._
 
-## Stack
+## License
 
-ESP32-S3-DevKitC-1-N16R8 · Dragino LoRa/GPS HAT (SX1276, 915MHz, L80 GPS) · SSD1306 OLED · MeshCore · PlatformIO · RadioLib · KiCad · custom 3D-printed enclosure
-
----
-
-*Built and tested June–July 2026. MeshCore (meshcore-dev/MeshCore), PlatformIO espressif32@6.11.0, RadioLib 7.7.1.*
+[GNU General Public License v3.0](LICENSE)
