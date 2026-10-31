@@ -59,6 +59,32 @@ This wasn't a drop-in board support file. Getting MeshCore to run correctly on t
 
 All three are built from the same variant and the same wiring; the only thing that changes is which PlatformIO environment gets flashed.
 
+## Firmware
+
+The firmware is a set of files that drop into a clone of [MeshCore](https://github.com/meshcore-dev/MeshCore). Each folder in [`/firmware`](/firmware) mirrors the MeshCore directory layout, so its contents copy straight into the root of the clone. There are two versions:
+
+| Folder | Hardware | Node roles |
+|---|---|---|
+| [`full_node`](/firmware/full_node) | Carrier PCB: LoRa, GPS, SSD1306 OLED, button, and buzzer | Repeater, Companion (BLE), Companion (USB) |
+| [`lora_only`](/firmware/lora_only) | Dragino HAT jumper-wired to the ESP32-S3, LoRa radio only | Repeater, Companion (BLE) |
+
+```
+firmware/full_node/
+├── boards/
+│   └── dragino_esp32s3_n16r8.json      # Custom board definition (OPI PSRAM fix)
+├── examples/
+│   └── companion_radio/
+│       └── main.cpp                    # Modified MeshCore companion entry point (BLE or USB)
+└── variants/
+    └── dragino_esp32s3/
+        ├── DraginoESP32S3Board.h       # Board class (LoRa IRQ GPIO)
+        ├── target.h                    # Hardware declarations
+        ├── target.cpp                  # Radio, GPS, I2C, display, and button setup
+        └── platformio.ini              # Build environments (repeater, BLE, USB)
+```
+
+`lora_only` has the same layout without `examples/`. `main.cpp` and the variant structure are adapted from MeshCore, which is MIT licensed.
+
 ## Building it
 
 Please see the [full guide](../../wiki/Building-It) in the wiki.
