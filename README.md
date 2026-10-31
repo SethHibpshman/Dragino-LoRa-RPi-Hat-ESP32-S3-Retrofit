@@ -87,7 +87,7 @@ firmware/full_node/
 
 ## Building it
 
-Please see the [full guide](../../wiki/Building-It) in the wiki.
+Please see the [setup guide](../../wiki) in the wiki for parts, wiring, firmware setup, flashing, and troubleshooting.
 
 ---
 
