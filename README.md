@@ -25,6 +25,8 @@ The Dragino HAT header doesn't line up with anything on the ESP32-S3, so I desig
 - Routes the GPS UART (TX/RX) and I2C (SDA/SCL) separately, since the L80 GPS module and the SSD1306 display need to share the board without colliding with the SPI bus
 - Adds a 4-cell battery holder array, a power switch, a buzzer, and a footprint for the OLED and user button, so the whole companion radio build (display, button, buzzer, GPS, LoRa) lives on one board instead of a nest of jumper wires
 
+KiCad project files are in [`/hardware/kicad_project_files`](/hardware/kicad_project_files), and fabrication-ready Gerbers are in [`/hardware/gerbers`](/hardware/gerbers).
+
 ### 3D-printed case
 
 ![Case render](images/case_render.png)
